@@ -29,7 +29,7 @@ const App = ({ signOut, user }) => {
 
   async function fetchNotes() {
     try {
-      const apiData = await API.graphql({ query: listNotes });
+      const apiData = await apiData.graphql({ query: listNotes });
       const notesFromAPI = apiData.data.listNotes.items;
       setNotes(notesFromAPI);
     } catch (error) {
