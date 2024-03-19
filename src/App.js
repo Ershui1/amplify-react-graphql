@@ -45,7 +45,7 @@ const App = ({ signOut, user }) => {
       description: form.get("description"),
     };
     try {
-      await API.graphql({
+      await data.graphql({
         query: createNoteMutation,
         variables: { input: data },
       });
@@ -59,7 +59,7 @@ const App = ({ signOut, user }) => {
   async function deleteNote({ id }) {
     const newNotes = notes.filter((note) => note.id !== id);
     try {
-      await API.graphql({
+      await newNotes.graphql({
         query: deleteNoteMutation,
         variables: { input: { id } },
       });
