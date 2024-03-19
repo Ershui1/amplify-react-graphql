@@ -16,7 +16,7 @@ import {
   createNote as createNoteMutation,
   deleteNote as deleteNoteMutation,
 } from "./graphql/mutations";
-import config from './aws-exports'; // 注意这里的文件名，通常这个文件是aws-exports.js
+import config from './aws-exports'; 
 
 Amplify.configure(config);
 
