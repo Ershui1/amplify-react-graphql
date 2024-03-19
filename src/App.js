@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./App.css";
 import "@aws-amplify/ui-react/styles.css";
-import { API } from "aws-amplify";
+import { API, Amplify } from "aws-amplify";
 import {
   Button,
   Flex,
@@ -16,8 +16,11 @@ import {
   createNote as createNoteMutation,
   deleteNote as deleteNoteMutation,
 } from "./graphql/mutations";
+import config from './aws-exports'; // 注意这里的文件名，通常这个文件是aws-exports.js
 
-const App = ({ signOut }) => {
+Amplify.configure(config);
+
+const App = ({ signOut, user }) => {
   const [notes, setNotes] = useState([]);
 
   useEffect(() => {
@@ -25,9 +28,13 @@ const App = ({ signOut }) => {
   }, []);
 
   async function fetchNotes() {
-    const apiData = await API.graphql({ query: listNotes });
-    const notesFromAPI = apiData.data.listNotes.items;
-    setNotes(notesFromAPI);
+    try {
+      const apiData = await API.graphql({ query: listNotes });
+      const notesFromAPI = apiData.data.listNotes.items;
+      setNotes(notesFromAPI);
+    } catch (error) {
+      console.error("Error fetching notes", error);
+    }
   }
 
   async function createNote(event) {
@@ -37,21 +44,29 @@ const App = ({ signOut }) => {
       name: form.get("name"),
       description: form.get("description"),
     };
-    await API.graphql({
-      query: createNoteMutation,
-      variables: { input: data },
-    });
-    fetchNotes();
+    try {
+      await API.graphql({
+        query: createNoteMutation,
+        variables: { input: data },
+      });
+      fetchNotes();
+    } catch (error) {
+      console.error("Error creating a note", error);
+    }
     event.target.reset();
   }
 
   async function deleteNote({ id }) {
     const newNotes = notes.filter((note) => note.id !== id);
-    setNotes(newNotes);
-    await API.graphql({
-      query: deleteNoteMutation,
-      variables: { input: { id } },
-    });
+    try {
+      await API.graphql({
+        query: deleteNoteMutation,
+        variables: { input: { id } },
+      });
+      setNotes(newNotes);
+    } catch (error) {
+      console.error("Error deleting a note", error);
+    }
   }
 
   return (
